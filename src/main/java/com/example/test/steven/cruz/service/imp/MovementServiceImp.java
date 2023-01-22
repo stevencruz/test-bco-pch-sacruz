@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.test.steven.cruz.dto.AccountRequest;
 import com.example.test.steven.cruz.dto.AccountResponse;
 import com.example.test.steven.cruz.dto.CustomMovementResponse;
 import com.example.test.steven.cruz.dto.FinalResponse;
@@ -35,8 +34,8 @@ public class MovementServiceImp implements MovementService {
 	@Autowired
 	private AccountServiceImp accountService;
 
-	@Value("${MAX_VALUE}")
-    private Integer maxValue;
+	@Value("${MAX_VALUE_DEBIT}")
+    private String maxValue;
 	
 	@Override
 	public List<MovementResponse> findAllMovements() throws NotFoundException {
@@ -103,7 +102,7 @@ public class MovementServiceImp implements MovementService {
 		//debito
 		else if (movementRequest.getMovementType().equals("D")){
 			//validaciones para el debito 
-			if (movementRequest.getValue() + sumDebitDay > maxValue) {
+			if (movementRequest.getValue() + sumDebitDay > Integer.parseInt(maxValue) ) {
 				throw new NotLogicValidateException(" “Cupo diario Excedido");
 			}
 			
