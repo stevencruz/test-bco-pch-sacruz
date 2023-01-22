@@ -3,6 +3,7 @@ package com.example.test.steven.cruz.service.imp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,9 +23,14 @@ import com.example.test.steven.cruz.exception.NotFoundException;
 import com.example.test.steven.cruz.exception.NotLogicValidateException;
 import com.example.test.steven.cruz.repository.MovementRepository;
 import com.example.test.steven.cruz.service.MovementService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class MovementServiceImp implements MovementService { 
 
@@ -33,6 +39,8 @@ public class MovementServiceImp implements MovementService {
 	
 	@Autowired
 	private AccountServiceImp accountService;
+	
+	private ObjectMapper objectMapper;
 
 	@Value("${MAX_VALUE_DEBIT}")
     private String maxValue;
@@ -215,12 +223,33 @@ public class MovementServiceImp implements MovementService {
 	@Override
 	public List<CustomMovementResponse> findMovementByDateAndClientId(MovementRequest movementRequest)
 			throws NotFoundException {
+		
 		var customResponse = movementRepository.findMovementByDateAndClientId(movementRequest.getDate(), movementRequest.getFinalDate(), movementRequest.getIdClient());
 		
-		if(Objects.isNull(movementRepository) || customResponse.size()==0) {
+		log.info("RESPONSE - customResponse" + customResponse);
+		
+		var responseList = Arrays.asList(customResponse);	
+		
+		if(Objects.isNull(responseList) || responseList.size()==0) {
 			throw new NotFoundException("No se encontraron movimientos en el rango de fecha para el cliente");
 		}
+	
 		
-		return customResponse;
+		var customResponseList = new ArrayList<CustomMovementResponse>();
+		responseList.forEach(customRow -> {
+			customResponseList.add(CustomMovementResponse.builder()
+					.movement_date(customRow[0].toString())
+					.name(customRow[1].toString())
+					.account_number(customRow[2].toString())
+					.account_type(customRow[3].toString())
+					.account_initial_amount(customRow[4].toString())
+					.account_status(customRow[5].toString())
+					.movementType(customRow[6].toString())
+					.movement_value(customRow[7].toString())
+					.movement_balance(customRow[8].toString())
+					.build());
+			log.info("RESPONSE - customRow" + customRow[0].toString());
+		});
+		return customResponseList;
 	}
 }

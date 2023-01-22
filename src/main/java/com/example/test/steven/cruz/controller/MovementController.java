@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.test.steven.cruz.dto.CustomMovementResponse;
 import com.example.test.steven.cruz.dto.FinalResponse;
 import com.example.test.steven.cruz.dto.MovementRequest;
 import com.example.test.steven.cruz.dto.MovementResponse;
@@ -69,4 +70,11 @@ public class MovementController {
 		return response;
 	}
 
+	@GetMapping("/findMovement/ByClientId")
+	public List<CustomMovementResponse> findMovementByDateAndClientId(@RequestBody MovementRequest movementRequest) throws NotFoundException {
+		log.info("REQUEST: " + movementRequest);
+		var response = movementServiceImp.findMovementByDateAndClientId(movementRequest);
+		log.info("RESPONSE: " + response);
+		return response;
+	}
 }
